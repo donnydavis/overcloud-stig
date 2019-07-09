@@ -2,7 +2,7 @@
 export image=overcloud-full.qcow2
 echo "#################################################################################"
 echo "# These are instructions for how to build a DISA STIG Compliant overcloud image #"
-echo "# This will work with OSP11  - please contact donny@redhat.com with issues      #"
+echo "# This will work with OSP13  - please contact donny@redhat.com with issues      #"
 echo "#################################################################################"
 read -p "Skip questions and use export variables? (y/n)" skipinquisition
 if [[ $skipinquisition =~ ^[Nn]$ ]]
@@ -35,7 +35,7 @@ then
   echo "##########################"
   echo "# Getting Factory Images #"
   echo "##########################"
-  for i in /usr/share/rhosp-director-images/overcloud-full-latest-11.0.tar /usr/share/rhosp-director-images/ironic-python-agent-latest-11.0.tar; do tar -xvf $i; done
+  for i in /usr/share/rhosp-director-images/overcloud-full-latest-13.0.tar /usr/share/rhosp-director-images/ironic-python-agent-latest-13.0.tar; do tar -xvf $i; done
   sync
 fi
 echo "####################################"
@@ -66,6 +66,9 @@ virt-customize -a $image --upload overcloud-remediation.sh:/opt
 virt-customize -a $image --run-command 'chmod +x /opt/overcloud-remediation.sh'
 virt-customize -v -a $image --run-command '/opt/overcloud-remediation.sh'
 virt-customize -a $image --delete '/opt/overcloud-remediation.sh'
+#NOTE: deployments hanging on step 1
+#      https://bugs.launchpad.net/tripleo/+bug/1657108
+virt-customize -a $image --run-command="echo '' > /etc/sysconfig/iptables"
 echo "#########################################"
 echo "# Unregistering and Unsubscribing Image #"
 echo "#########################################"
